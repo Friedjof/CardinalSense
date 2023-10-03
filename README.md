@@ -2,6 +2,8 @@
 
 CardinalSense is a project designed to enhance your orientation by providing real-time direction sensing using a digital compass. It allows you to determine your heading accurately and conveniently, aiding in navigation and orientation tasks.
 
+    This is currently a work in progress. The project is still in its early stages of development. Images and additional information will be added soon.
+
 ## Features
 
 - Accurate heading information: Utilizes a digital compass (e.g., GY-271) to provide precise direction data.
@@ -27,6 +29,17 @@ Follow these steps to get started with CardinalSense:
 - [Wire library](https://www.arduino.cc/en/reference/wire)
 
 Make sure to install these libraries in your PlatformIO project.
+
+## The name "CardinalSense"
+CardinalSense is a project name that combines two key elements: "Cardinal" and "Sense."
+
+1. **Cardinal**: In the context of navigation and orientation, "Cardinal" refers to the four primary directions on the compass—North, South, East, and West. These cardinal directions serve as fundamental reference points for navigation and provide a basis for understanding one's orientation.
+
+2. **Sense**: "Sense" signifies the ability to perceive or detect something. In this project, it represents the core functionality of enhancing your orientation by providing a real-time "sense" or awareness of your current heading or direction.
+
+Together, "**CardinalSense**" encapsulates the primary goal of the project, which is to provide a sensing mechanism for cardinal directions, helping users gain a better understanding of their orientation, particularly in relation to the cardinal points on the compass.
+
+This project's name emphasizes its capability to detect and convey cardinal directions accurately, contributing to improved navigation and orientation experiences.
 
 ## Contributing
 
