@@ -28,11 +28,6 @@ jobs:
     - name: Build all platforms
       run: platformio run
 
-    - name: Build FS Images
-      run: |
-        mv data/config.json-template data/config.json
-        platformio run -t buildfs
-
     - name: Archive binaries
       run: |
         mkdir -p binaries/esp32dev binaries/esp8266
