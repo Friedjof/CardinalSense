@@ -22,6 +22,27 @@ Follow these steps to get started with CardinalSense:
 
 4. **Usage**: Once everything is set up, CardinalSense will provide you with real-time direction information based on your compass readings.
 
+### Flashing
+In the release section, you can find the latest binary files for the microcontrollers. You can use the following commands to flash the binary files to the `ESP32` or `ESP8266` microcontroller.
+
+You need to install the esptool first.
+```bash
+pip install esptool
+```
+You can also use the nix-shell to get a shell with all dependencies installed `nix-shell`.
+
+#### *firmware.bin, bootloader.bin and partitions.bin (ESP32)*
+```bash
+esptool.py --port /dev/ttyUSB0 --baud 921600 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 bootloader.bin 0x8000 partitions.bin 0x10000 firmware.bin
+```
+Change the `--port` parameter to match your system configuration and the path to the binary files.
+
+#### *firmware.bin (ESP8266)*
+```bash
+esptool.py --port /dev/ttyUSB0 --baud 921600 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x10000 firmware.bin
+```
+Change the `--port` parameter to match your system configuration and the path to the binary files.
+
 ## Dependencies
 
 - [Adafruit_Sensor](https://github.com/adafruit/Adafruit_Sensor)
