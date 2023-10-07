@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Wire.h>
 
 // Motor PWM pin
 #define MOTOR_PWM_PIN 3
