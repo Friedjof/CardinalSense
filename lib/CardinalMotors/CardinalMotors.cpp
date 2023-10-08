@@ -4,35 +4,50 @@
 CardinalMotors::~CardinalMotors() {
 }
 
-CardinalMotors::CardinalMotors(byte sc_pin) {
-    this->sc_pin = sc_pin;
+CardinalMotors::CardinalMotors(int latch_pin, int clock_pin, int data_pin) {
+    this->latch_pin = latch_pin;
+    this->clock_pin = clock_pin;
+    this->data_pin = data_pin;
+
+    pinMode(latch_pin, OUTPUT);
+    pinMode(clock_pin, OUTPUT);
+    pinMode(data_pin, OUTPUT);
 }
 
-void CardinalMotors::init() {
-    pinMode(this->sc_pin, OUTPUT);
+void CardinalMotors::set(int pin, byte value) {
+    if (value) {
+        this->current_state |= (1 << pin);
+    } else {
+        this->current_state &= ~(1 << pin);
+    }
 
-    SPI.begin();
-    SPI.setDataMode(SPI_MODE0);
-    SPI.setClockDivider(SPI_CLOCK_DIV128);
-    
-    this->sendByte(MAX7219_REG_SCANLIMIT,   7); // show all 8 digits
-    this->sendByte(MAX7219_REG_DECODEMODE,  0); // using an led matrix (not digits)
-    this->sendByte(MAX7219_REG_DISPLAYTEST, 0); // no display test
-    this->sendByte(MAX7219_REG_INTENSITY,   0); // character intensity: range: 0 to 15
-    this->sendByte(MAX7219_REG_SHUTDOWN,    1); // not in shutdown mode (ie. start it up)
+    this->update(this->current_state);
 }
 
-void CardinalMotors::sendByte(const byte reg, const byte data) {
-    // enable the line
-    digitalWrite(this->sc_pin, LOW);
+void CardinalMotors::update(short data) {
+    digitalWrite(this->latch_pin, LOW);
+    digitalWrite(this->data_pin, LOW);
+    digitalWrite(this->clock_pin, LOW);
 
-    // now shift out the data
-    SPI.transfer (reg);
-    SPI.transfer (data);
+    this->shiftOut(data & 0xff);
+    this->shiftOut((data >> 8) & 0xff);
 
-    digitalWrite(this->sc_pin, HIGH);
+    digitalWrite(this->clock_pin, LOW);
+    digitalWrite(this->latch_pin, HIGH);
 }
 
-void CardinalMotors::setIntensity(const byte intensity) {
-    this->sendByte(MAX7219_REG_INTENSITY, intensity);
+void CardinalMotors::shiftOut(byte data) {
+    digitalWrite(this->data_pin, LOW);
+    digitalWrite(this->clock_pin, LOW);
+
+    for (int i = 7; i >= 0; i--) {
+        digitalWrite(this->clock_pin, LOW);
+
+        digitalWrite(this->data_pin, ~(data >> i) & 1);
+
+        digitalWrite(this->clock_pin, HIGH);
+        digitalWrite(this->data_pin, LOW);
+    }
+
+    digitalWrite(this->clock_pin, LOW);
 }

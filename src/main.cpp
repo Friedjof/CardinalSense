@@ -1,21 +1,25 @@
 #include <SPI.h>
 #include <CardinalMotors.h>
 
-#define NUMBER_OF_DEVICES 1
-#define CS_PIN 21
+#define LATCH_PIN 22
+#define CLOCK_PIN 21
+#define DATA_PIN 23
 
-CardinalMotors motors(CS_PIN);
+
+CardinalMotors motors(LATCH_PIN, CLOCK_PIN, DATA_PIN);
 
 void setup() {
-    motors.init();
-    motors.setIntensity(0);
+  Serial.begin(115200);
+
+  Serial.println("--- Starting ---");
 }
 
 void loop() {
-  for (int i = 1; i <= 8; i++) {
-    for (int j = 0; j < 8; j++) {
-      motors.sendByte(i, 0x01 << j);
-      delay(100);
-    }
+  for (int i = 0, j = 15; i < 16; i++, j--) {
+    motors.set(i, HIGH);
+    motors.set(j, HIGH);
+    delay(100);
+    motors.set(i, LOW);
+    motors.set(j, LOW);
   }
 }
