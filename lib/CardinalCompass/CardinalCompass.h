@@ -12,7 +12,7 @@ public:
   int  ready();
   void reconfig();
 
-  float absoluteAngle();
+  float heading();
 
   int readRaw( int16_t *x, int16_t *y, int16_t *z, int16_t *t );
 
@@ -21,6 +21,9 @@ public:
   void setOversampling( int ovl );
 
 private:
+  int16_t xlow, xhigh;
+  int16_t ylow, yhigh;
+
   uint8_t addr;
   uint8_t mode;
   uint8_t rate;
