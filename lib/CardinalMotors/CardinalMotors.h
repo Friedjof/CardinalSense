@@ -9,6 +9,10 @@
 #include <Arduino.h>
 #include <SPI.h>
 
+#define CIRCLE 360
+#define NUM_MOTORS 16
+#define CALIBRATION 5
+
 class CardinalMotors {
 private:
     int latch_pin;
@@ -22,7 +26,11 @@ public:
     CardinalMotors(int latch_pin, int clock_pin, int data_pin);
 
     void set(int pin, byte value);
+    void set_angle(float angle);
     void update(short data);
     void shiftOut(byte data);
+
+    void on(byte pin);
+    void off(byte pin);
 };
 #endif

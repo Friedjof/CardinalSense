@@ -170,26 +170,34 @@ int CardinalCompass::readRaw( int16_t *x, int16_t *y, int16_t *z, int16_t *t ) {
   return 1;
 }
 
-/*
-  get the absolut angel x, y and z
-*/
-float CardinalCompass::absoluteAngle() {
+float CardinalCompass::heading(){
   int16_t x, y, z, t;
-  float heading = 0;
 
   if(!readRaw(&x,&y,&z,&t)) return 0;
 
-  if (y < 0) {
-    heading = 180 + (180 + (atan2(y, x) * (180 / M_PI)));
-  } else {
-    heading = atan2(y, x) * (180 / M_PI);
-  }
+  /* Update the observed boundaries of the measurements */
 
-  if (heading < 0) {
-    heading += 360;
-  } else if (heading >= 360) {
-    heading -= 360;
-  }
+  if(x < this->xlow) this->xlow = x;
+  if(x > this->xhigh) this->xhigh = x;
+  if(y < this->ylow) this->ylow = y;
+  if(y > this->yhigh) this->yhigh = y;
 
+  /* Bail out if not enough data is available. */
+  
+  if( this->xlow == this->xhigh || this->ylow == this->yhigh ) return 0;
+
+  /* Recenter the measurement by subtracting the average */
+
+  x -= (this->xhigh + this->xlow)/2;
+  y -= (this->yhigh + this->ylow)/2;
+
+  /* Rescale the measurement to the range observed. */
+  
+  float fx = (float)x / (this->xhigh - this->xlow);
+  float fy = (float)y / (this->yhigh - this->ylow);
+
+  float heading = 180.0 * atan2(fy, fx) / M_PI;
+  if(heading <= 0) heading += 360;
+  
   return heading;
 }

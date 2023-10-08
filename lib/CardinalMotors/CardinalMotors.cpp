@@ -24,22 +24,29 @@ void CardinalMotors::set(int pin, byte value) {
     this->update(this->current_state);
 }
 
-void CardinalMotors::update(short data) {
-    digitalWrite(this->latch_pin, LOW);
-    digitalWrite(this->data_pin, LOW);
-    digitalWrite(this->clock_pin, LOW);
+void CardinalMotors::set_angle(float angle) {
+    this->on(((byte) round(angle / (CIRCLE / (NUM_MOTORS - 0x01))) + CALIBRATION) % NUM_MOTORS);
+}
 
+void CardinalMotors::update(short data) {
+    // Latch low
+    digitalWrite(this->latch_pin, LOW);
+
+    // Shift out the data
     this->shiftOut(data & 0xff);
     this->shiftOut((data >> 8) & 0xff);
 
-    digitalWrite(this->clock_pin, LOW);
+    // Latch high
     digitalWrite(this->latch_pin, HIGH);
 }
 
 void CardinalMotors::shiftOut(byte data) {
+    // MSB first
     digitalWrite(this->data_pin, LOW);
+    // Clock low
     digitalWrite(this->clock_pin, LOW);
 
+    // Shift out the bits
     for (int i = 7; i >= 0; i--) {
         digitalWrite(this->clock_pin, LOW);
 
@@ -49,5 +56,24 @@ void CardinalMotors::shiftOut(byte data) {
         digitalWrite(this->data_pin, LOW);
     }
 
+    // Clock low
     digitalWrite(this->clock_pin, LOW);
+}
+
+void CardinalMotors::on(byte pin) {
+    short new_state = 0x00 | (1 << pin);
+
+    if (new_state != this->current_state) {
+        this->current_state = new_state;
+        this->update(this->current_state);
+    }
+}
+
+void CardinalMotors::off(byte pin) {
+    short new_state = 0x00 & ~(1 << pin);
+
+    if (new_state != this->current_state) {
+        this->current_state = new_state;
+        this->update(this->current_state);
+    }
 }
