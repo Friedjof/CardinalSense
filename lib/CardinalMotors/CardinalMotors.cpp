@@ -50,7 +50,7 @@ void CardinalMotors::shiftOut(byte data) {
     for (int i = 7; i >= 0; i--) {
         digitalWrite(this->clock_pin, LOW);
 
-        digitalWrite(this->data_pin, ~(data >> i) & 1);
+        digitalWrite(this->data_pin, (data >> i) & 1);
 
         digitalWrite(this->clock_pin, HIGH);
         digitalWrite(this->data_pin, LOW);
