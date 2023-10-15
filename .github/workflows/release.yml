@@ -30,10 +30,9 @@ jobs:
 
     - name: Archive binaries
       run: |
-        mkdir -p binaries/esp32dev binaries/esp8266
+        mkdir binaries
 
-        mv .pio/build/esp32dev/*.bin binaries/esp32dev/
-        mv .pio/build/esp8266/*.bin binaries/esp8266/
+        mv .pio/build/esp32dev/*.bin binaries/
 
     - name: Create Release
       id: create_release
@@ -42,6 +41,5 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         tag: ${{ github.ref }}
         files: >
-          binaries/esp32dev/
-          binaries/esp8266/
+          binaries/
         gzip: folders

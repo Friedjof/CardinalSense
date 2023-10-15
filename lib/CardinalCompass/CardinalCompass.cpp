@@ -79,7 +79,7 @@ void CardinalCompass::reconfig() {
 
 void CardinalCompass::reset() {
   write_register(addr,CARDINAL_COMPASS_RESET,0x01);
-  reconfig();
+  this->reconfig();
 }
 
 /*
@@ -101,7 +101,7 @@ void CardinalCompass::setOversampling( int x ) {
       oversampling = CARDINAL_COMPASS_CONFIG_OS64;
       break;
   } 
-  reconfig();
+  this->reconfig();
 }
 
 void CardinalCompass::setRange( int x ) {
@@ -113,7 +113,7 @@ void CardinalCompass::setRange( int x ) {
       range = CARDINAL_COMPASS_CONFIG_8GAUSS;
       break;
   }
-  reconfig();
+  this->reconfig();
 }
 
 void CardinalCompass::setSamplingRate( int x ) {
@@ -131,17 +131,17 @@ void CardinalCompass::setSamplingRate( int x ) {
       rate = CARDINAL_COMPASS_CONFIG_200HZ;
       break;
   }
-  reconfig();
+  this->reconfig();
 }
 
-void CardinalCompass::init() {
+void CardinalCompass::begin() {
   /* This assumes the wire library has been initialized. */
   addr = CARDINAL_COMPASS_ADDR;
   oversampling = CARDINAL_COMPASS_CONFIG_OS512;
   range = CARDINAL_COMPASS_CONFIG_2GAUSS;
   rate = CARDINAL_COMPASS_CONFIG_50HZ;
   mode = CARDINAL_COMPASS_CONFIG_CONT;
-  reset();
+  this->reset();
 }
 
 int CardinalCompass::ready() {

@@ -1,36 +1,36 @@
+#pragma once
 /*
   Library for controlling the Cardinal Motors (Vibration Motors)
   Because of the high number of motors (16), we need to use the IC 74HC595
 */
 
-#ifndef __DEFINED_CARDINALMOTORS_H__
-#define __DEFINED_CARDINALMOTORS_H__
-
 #include <Arduino.h>
 #include <SPI.h>
+#include <Wire.h>
 
 #define CIRCLE 360
 #define NUM_MOTORS 16
 #define CALIBRATION 5
+#define I2C_START_ADDRESS 0x20
+#define I2C_MODULES 8
 
 class CardinalMotors {
-private:
-    int latch_pin;
-    int clock_pin;
-    int data_pin;
+  private:
+    int sda_pin;
+    int scl_pin;
 
-    // 16 bits for 16 motors
-    short current_state;
-public:
+    short c_state = 0x0000;
+
+    void send_state_to_module(byte module, byte state);
+    byte calc_module(byte pin);
+
+  public:
     ~CardinalMotors();
-    CardinalMotors(int latch_pin, int clock_pin, int data_pin);
+    CardinalMotors(int sda_pin, int scl_pin);
 
-    void set(int pin, byte value);
+    void begin();
+
+    void set(byte pin, bool value);
+
     void set_angle(float angle);
-    void update(short data);
-    void shiftOut(byte data);
-
-    void on(byte pin);
-    void off(byte pin);
 };
-#endif

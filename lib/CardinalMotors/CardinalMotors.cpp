@@ -1,79 +1,72 @@
 #include "CardinalMotors.h"
 
 
-CardinalMotors::~CardinalMotors() {
+CardinalMotors::~CardinalMotors() { }
+
+CardinalMotors::CardinalMotors(int sda_pin, int scl_pin) {
+  this->sda_pin = sda_pin;
+  this->scl_pin = scl_pin;
 }
 
-CardinalMotors::CardinalMotors(int latch_pin, int clock_pin, int data_pin) {
-    this->latch_pin = latch_pin;
-    this->clock_pin = clock_pin;
-    this->data_pin = data_pin;
-
-    pinMode(latch_pin, OUTPUT);
-    pinMode(clock_pin, OUTPUT);
-    pinMode(data_pin, OUTPUT);
+void CardinalMotors::begin() {
+  // start the I²C bus
+  Wire.begin(this->sda_pin, this->scl_pin);
+  
+  for (int i = 0; i < I2C_MODULES; i++) {
+    // Send the state to the module
+    this->send_state_to_module(I2C_START_ADDRESS + i, 0x00);
+  }
 }
 
-void CardinalMotors::set(int pin, byte value) {
-    if (value) {
-        this->current_state |= (1 << pin);
-    } else {
-        this->current_state &= ~(1 << pin);
-    }
+byte CardinalMotors::calc_module(byte pin) {
+  // Calculate the module
+  return (pin - (pin % 0x02)) / 0x02;
+}
 
-    this->update(this->current_state);
+void CardinalMotors::send_state_to_module(byte module, byte state) {
+  // Send the state to the module
+  byte address = I2C_START_ADDRESS + module;
+
+  // Send the state to the module
+  Wire.beginTransmission(address);
+  Wire.write(state);
+  Wire.endTransmission();
+}
+
+void CardinalMotors::set(byte pin, bool value) {
+  // Set the pin to the value
+  byte module = this->calc_module(pin);
+
+  // Calculate the new state
+  short n_state = this->c_state;
+
+  if (value) {
+    n_state |= (0x01 << pin);
+  } else {
+    n_state &= ~(0x01 << pin);
+  }
+
+  // Save the new state
+  this->c_state = n_state;
+
+  // Send the new state to the module
+  byte v = (n_state >> (module * 0x02)) & 0x03;
+
+  this->send_state_to_module(module, v);
 }
 
 void CardinalMotors::set_angle(float angle) {
-    this->on(((byte) round(angle / (CIRCLE / (NUM_MOTORS - 0x01))) + CALIBRATION) % NUM_MOTORS);
-}
+  // Set the motors to the angle
+  float step = CIRCLE / NUM_MOTORS;
 
-void CardinalMotors::update(short data) {
-    // Latch low
-    digitalWrite(this->latch_pin, LOW);
+  int motor = (int) (angle / step);
 
-    // Shift out the data
-    this->shiftOut(data & 0xff);
-    this->shiftOut((data >> 8) & 0xff);
-
-    // Latch high
-    digitalWrite(this->latch_pin, HIGH);
-}
-
-void CardinalMotors::shiftOut(byte data) {
-    // MSB first
-    digitalWrite(this->data_pin, LOW);
-    // Clock low
-    digitalWrite(this->clock_pin, LOW);
-
-    // Shift out the bits
-    for (int i = 7; i >= 0; i--) {
-        digitalWrite(this->clock_pin, LOW);
-
-        digitalWrite(this->data_pin, (data >> i) & 1);
-
-        digitalWrite(this->clock_pin, HIGH);
-        digitalWrite(this->data_pin, LOW);
+  // Set the motors
+  for (int i = 0; i < NUM_MOTORS; i++) {
+    if (i == motor) {
+      this->set(i, true);
+    } else {
+      this->set(i, false);
     }
-
-    // Clock low
-    digitalWrite(this->clock_pin, LOW);
-}
-
-void CardinalMotors::on(byte pin) {
-    short new_state = 0x00 | (1 << pin);
-
-    if (new_state != this->current_state) {
-        this->current_state = new_state;
-        this->update(this->current_state);
-    }
-}
-
-void CardinalMotors::off(byte pin) {
-    short new_state = 0x00 & ~(1 << pin);
-
-    if (new_state != this->current_state) {
-        this->current_state = new_state;
-        this->update(this->current_state);
-    }
+  }
 }

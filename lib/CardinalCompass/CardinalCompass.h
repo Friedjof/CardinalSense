@@ -7,7 +7,8 @@
 
 class CardinalCompass {
 public:
-  void init();
+  void begin();
+  
   void reset();
   int  ready();
   void reconfig();
