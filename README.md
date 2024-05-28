@@ -2,7 +2,7 @@
 
 CardinalSense is a project designed to enhance your orientation by providing real-time direction sensing using a digital compass. It allows you to determine your heading accurately and conveniently, aiding in navigation and orientation tasks.
 
-    This is currently a work in progress. The project is still in its early stages of development. Images and additional information will be added soon.
+> This is currently a work in progress. The project is still in its early stages of development. Images and additional information will be added soon.
 
 ## Features
 
